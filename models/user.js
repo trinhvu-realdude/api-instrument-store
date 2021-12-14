@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
         phone: DataTypes.STRING,
         province: DataTypes.STRING,
         image: DataTypes.STRING,
-        roleId: DataTypes.INTEGER
+        roleId: DataTypes.INTEGER,
+        refreshToken: DataTypes.STRING
     }, {sequelize, modelName: 'User'});
     return User;
 };

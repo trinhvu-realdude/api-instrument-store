@@ -22,3 +22,12 @@ exports.registerUser = (user) => User.create({
     password: user.password,
     roleId: 2
 });
+
+exports.updateRefreshToken = (refreshToken, id) => User.update(
+    {
+        refreshToken: refreshToken
+    }, {
+    where: {
+        id: id
+    }
+})

@@ -35,6 +35,9 @@ module.exports = {
             roleId: {
                 type: Sequelize.INTEGER
             },
+            refreshToken: {
+                type: Sequelize.STRING
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE

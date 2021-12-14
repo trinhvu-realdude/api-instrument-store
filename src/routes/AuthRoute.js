@@ -7,5 +7,7 @@ module.exports = app => {
 
     router.post("/login", AuthController.login);
 
+    router.post("/refresh-token", AuthController.refreshToken);
+
     app.use('/v1/api', router);
 }
