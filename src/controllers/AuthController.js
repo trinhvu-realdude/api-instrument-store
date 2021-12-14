@@ -3,14 +3,20 @@ const authService = require("../services/AuthService");
 const {hashPassword} = require("../common/hash");
 const passport = require("passport");
 
+const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+
+const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE;
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+
 exports.register = async (req, res) => {
     try {
         const checkEmail = await authService.checkEmail(req.body.email);
         const checkUsername = await authService.checkUsername(req.body.userName);
         if (checkEmail) {
-            return res.status(403).send("Email already existed!");
+            return res.status(403).send({msg: "Email already existed"});
         } else if (checkUsername) {
-            return res.status(403).send("Username already existed!");
+            return res.status(403).send({msg: "Username already existed"});
         } else {
             const {
                 userName,
@@ -37,7 +43,6 @@ exports.register = async (req, res) => {
             return res.status(200).json(user);
         }
     } catch (error) {
-        console.log(error);
         return res.status(500).json(error);
     }
 };
@@ -49,7 +54,7 @@ exports.login = async (req, res, next) => {
                 return next(err);
             }
             if (!user) {
-                return res.status(404).send("User doesn't exist!");
+                return res.status(404).send("User doesn't exist");
             }
 
             const dataForToken = {
@@ -59,9 +64,9 @@ exports.login = async (req, res, next) => {
                 userName: user.userName
             };
 
-            const accessToken = await jwtHelper.generateToken(dataForToken, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_LIFE);
+            const accessToken = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
 
-            let refreshToken = await jwtHelper.generateToken(dataForToken, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_LIFE);
+            let refreshToken = await jwtHelper.generateToken(dataForToken, refreshTokenSecret, refreshTokenLife);
 
             if (user.refreshToken === null) {
                 await authService.updateRefreshToken(refreshToken, user.id);
@@ -89,4 +94,25 @@ exports.login = async (req, res, next) => {
     })(req, res, next);
 };
 
-exports.refreshToken = async (req, res) => {};
+exports.refreshToken = async (req, res) => {
+    const refreshTokenFromClient = req.body.refreshToken;
+
+    if (refreshTokenFromClient) {
+        try {
+            const decodeRefreshToken = await jwtHelper.verifyToken(refreshTokenFromClient, refreshTokenSecret);
+
+            const dataForToken = {
+                _id: decodeRefreshToken._id,
+                userName: decodeRefreshToken.userName
+            };
+
+            const accessToken = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
+
+            return res.status(200).json({accessToken});
+        } catch (error) {
+            return res.status(403).send({msg: "Invalid refresh token"});
+        }
+    } else {
+        return res.status(403).send({msg: "No token provided"});
+    }
+};
