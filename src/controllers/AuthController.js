@@ -61,8 +61,11 @@ exports.login = async (req, res, next) => {
                 _id: `159-357-10${
                     user.id - 1
                 }`,
-                userName: user.userName
+                userName: user.userName,
+                roleId: user.roleId
             };
+
+            console.log(dataForToken);
 
             const accessToken = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
 
@@ -103,7 +106,8 @@ exports.refreshToken = async (req, res) => {
 
             const dataForToken = {
                 _id: decodeRefreshToken._id,
-                userName: decodeRefreshToken.userName
+                userName: decodeRefreshToken.userName,
+                roleId: decodeRefreshToken.roleId
             };
 
             const accessToken = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
@@ -116,3 +120,26 @@ exports.refreshToken = async (req, res) => {
         return res.status(403).send({msg: "No token provided"});
     }
 };
+
+exports.testCustomer = async (req, res) => {
+    const list = [
+        {
+            id: 1,
+            name: "Piano",
+            price: 25.55
+        }, {
+            id: 2,
+            name: "Guitar",
+            price: 15.55
+        }, {
+            id: 3,
+            name: "Violin",
+            price: 45.55
+        }, {
+            id: 4,
+            name: "Drum",
+            price: 35.55
+        },
+    ]
+    return res.status(200).json(list);
+}

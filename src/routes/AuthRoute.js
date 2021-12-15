@@ -1,4 +1,5 @@
 const AuthController = require("../controllers/AuthController");
+const AuthMiddleWare = require("../middleware/AuthMiddleware");
 const router = require("express").Router();
 
 module.exports = app => {
@@ -9,5 +10,9 @@ module.exports = app => {
 
     router.post("/refresh-token", AuthController.refreshToken);
 
-    app.use('/v1/api', router);
+    router.use(AuthMiddleWare.isCustomer(["Admin", "Customer"]));
+
+    router.get("/test", AuthController.testCustomer);
+
+    return app.use('/v1/api', router);
 }

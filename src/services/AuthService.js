@@ -1,5 +1,6 @@
 const db = require("../../models");
 const User = db.User;
+const Role = db.Role;
 
 exports.checkEmail = (email) => User.findOne({
     where: {
@@ -23,11 +24,12 @@ exports.registerUser = (user) => User.create({
     roleId: 2
 });
 
-exports.updateRefreshToken = (refreshToken, id) => User.update(
-    {
-        refreshToken: refreshToken
-    }, {
+exports.updateRefreshToken = (refreshToken, id) => User.update({
+    refreshToken: refreshToken
+}, {
     where: {
         id: id
     }
-})
+});
+
+exports.getRole = (roleId) => Role.findByPk(roleId, {attributes: ["name"]});
