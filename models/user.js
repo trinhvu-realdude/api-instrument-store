@@ -1,5 +1,6 @@
 'use strict';
 const {Model} = require('sequelize');
+const {v4: uuidv4} = require("uuid");
 module.exports = (sequelize, DataTypes) => {
     class User extends Model { /**
      * Helper method for defining associations.
@@ -7,20 +8,26 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
         static associate(models) { // define association here
-            User.belongsTo(models.Role, {foreignKey: "roleId"})
+            User.belongsTo(models.Role, {foreignKey: "role_id"})
         }
     };
     User.init({
-        userName: DataTypes.STRING,
-        firstName: DataTypes.STRING,
-        lastName: DataTypes.STRING,
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: () => uuidv4()
+        },
+        user_name: DataTypes.STRING,
+        first_name: DataTypes.STRING,
+        last_name: DataTypes.STRING,
         email: DataTypes.STRING,
         password: DataTypes.STRING,
         phone: DataTypes.STRING,
         province: DataTypes.STRING,
         image: DataTypes.STRING,
-        roleId: DataTypes.INTEGER,
-        refreshToken: DataTypes.STRING
+        role_id: DataTypes.INTEGER,
+        refresh_token: DataTypes.STRING
     }, {sequelize, modelName: 'User'});
     return User;
 };

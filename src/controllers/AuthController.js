@@ -12,16 +12,16 @@ const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 exports.register = async (req, res) => {
     try {
         const checkEmail = await authService.checkEmail(req.body.email);
-        const checkUsername = await authService.checkUsername(req.body.userName);
+        const checkUsername = await authService.checkUsername(req.body.user_name);
         if (checkEmail) {
             return res.status(403).send({msg: "Email already existed"});
         } else if (checkUsername) {
             return res.status(403).send({msg: "Username already existed"});
         } else {
             const {
-                userName,
-                firstName,
-                lastName,
+                user_name,
+                first_name,
+                last_name,
                 province,
                 email,
                 password
@@ -30,9 +30,9 @@ exports.register = async (req, res) => {
             const hash = await hashPassword(password);
 
             const data = {
-                userName: userName,
-                firstName: firstName,
-                lastName: lastName,
+                user_name: user_name,
+                first_name: first_name,
+                last_name: last_name,
                 province: province,
                 email: email,
                 password: hash
@@ -54,41 +54,39 @@ exports.login = async (req, res, next) => {
                 return next(err);
             }
             if (!user) {
-                return res.status(404).send("User doesn't exist");
+                return res.status(404).send({msg: "User doesn't exist"});
             }
 
             const dataForToken = {
-                _id: `159-357-10${
-                    user.id - 1
-                }`,
-                userName: user.userName,
-                roleId: user.roleId
+                id: user.id,
+                user_name: user.user_name,
+                role_id: user.role_id
             };
 
-            console.log(dataForToken);
+            const access_token = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
 
-            const accessToken = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
+            let refresh_token = await jwtHelper.generateToken(dataForToken, refreshTokenSecret, refreshTokenLife);
 
-            let refreshToken = await jwtHelper.generateToken(dataForToken, refreshTokenSecret, refreshTokenLife);
-
-            if (user.refreshToken === null) {
-                await authService.updateRefreshToken(refreshToken, user.id);
+            if (user.refresh_token === null) {
+                await authService.updateRefreshToken(refresh_token, user.id);
             } else {
-                refreshToken = user.refreshToken;
+                refresh_token = user.refresh_token;
             }
 
             return res.status(200).json({
                 msg: "Login successfully",
-                accessToken,
-                refreshToken,
+                access_token,
+                refresh_token,
                 user: {
-                    userName: user.userName,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
+                    id: user.id,
+                    user_name: user.user_name,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
                     email: user.email,
                     phone: user.phone,
                     province: user.province,
-                    image: user.image
+                    image: user.image,
+                    role_id: user.role_id
                 }
             });
         } catch (error) {
@@ -98,21 +96,21 @@ exports.login = async (req, res, next) => {
 };
 
 exports.refreshToken = async (req, res) => {
-    const refreshTokenFromClient = req.body.refreshToken;
+    const refreshTokenFromClient = req.body.refresh_token;
 
     if (refreshTokenFromClient) {
         try {
             const decodeRefreshToken = await jwtHelper.verifyToken(refreshTokenFromClient, refreshTokenSecret);
 
             const dataForToken = {
-                _id: decodeRefreshToken._id,
-                userName: decodeRefreshToken.userName,
-                roleId: decodeRefreshToken.roleId
+                id: decodeRefreshToken.id,
+                user_name: decodeRefreshToken.user_name,
+                role_id: decodeRefreshToken.role_id
             };
 
-            const accessToken = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
+            const access_token = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
 
-            return res.status(200).json({accessToken});
+            return res.status(200).json({access_token});
         } catch (error) {
             return res.status(403).send({msg: "Invalid refresh token"});
         }

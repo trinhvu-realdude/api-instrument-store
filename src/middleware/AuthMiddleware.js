@@ -11,13 +11,13 @@ exports.isAdmin = (roleArray) => async (req, res, next) => {
 
             req.decodeToken = decodeToken;
 
-            const role = await authService.getRole(decodeToken.roleId);
+            const role = await authService.getRole(decodeToken.role_id);
 
             if (role.name === roleArray[0]) {
-                next();
+                return next();
             }
         } catch (error) {
-            return res.status(401).json({msg: "Unauthorized"});
+            return res.status(401).send({msg: "Unauthorized"});
         }
     } else {
         return res.status(403).send({msg: "No token provided"});
@@ -25,23 +25,23 @@ exports.isAdmin = (roleArray) => async (req, res, next) => {
 };
 
 exports.isCustomer = (roleArray) => async (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
+    try {
+        const token = req.headers.authorization.split(" ")[1];
 
-    if (token) {
-        try {
+        if (token) {
             const decodeToken = await jwtHelper.verifyToken(token, accessTokenSecret);
 
             req.decodeToken = decodeToken;
 
-            const role = await authService.getRole(decodeToken.roleId);
+            const role = await authService.getRole(decodeToken.role_id);
 
             if (role.name === roleArray[1]) {
-                next();
+                return next();
             }
-        } catch (error) {
-            return res.status(401).json({msg: "Unauthorized"});
+        } else {
+            return res.status(403).send({msg: "No token provided"});
         }
-    } else {
-        return res.status(403).send({msg: "No token provided"});
+    } catch (error) {
+        return res.status(401).send({msg: "Unauthorized"});
     }
 };

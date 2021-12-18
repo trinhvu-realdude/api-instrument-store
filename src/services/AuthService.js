@@ -8,28 +8,28 @@ exports.checkEmail = (email) => User.findOne({
     }
 });
 
-exports.checkUsername = (username) => User.findOne({
+exports.checkUsername = (user_name) => User.findOne({
     where: {
-        userName: username
+        user_name: user_name
     }
 });
 
 exports.registerUser = (user) => User.create({
-    userName: user.userName,
-    firstName: user.firstName,
-    lastName: user.lastName,
+    user_name: user.user_name,
+    first_name: user.first_name,
+    last_name: user.last_name,
     province: user.province,
     email: user.email,
     password: user.password,
-    roleId: 2
+    role_id: 2
 });
 
-exports.updateRefreshToken = (refreshToken, id) => User.update({
-    refreshToken: refreshToken
+exports.updateRefreshToken = (token, id) => User.update({
+    refresh_token: token
 }, {
     where: {
         id: id
     }
 });
 
-exports.getRole = (roleId) => Role.findByPk(roleId, {attributes: ["name"]});
+exports.getRole = (id) => Role.findByPk(id, {attributes: ["name"]});
