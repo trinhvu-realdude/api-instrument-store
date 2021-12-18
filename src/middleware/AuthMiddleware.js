@@ -3,10 +3,10 @@ const jwtHelper = require("../helpers/JwtHelper");
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 
 exports.isAdmin = (roleArray) => async (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
+    try {
+        const token = req.headers.authorization.split(" ")[1];
 
-    if (token) {
-        try {
+        if (token) {
             const decodeToken = await jwtHelper.verifyToken(token, accessTokenSecret);
 
             req.decodeToken = decodeToken;
@@ -16,11 +16,11 @@ exports.isAdmin = (roleArray) => async (req, res, next) => {
             if (role.name === roleArray[0]) {
                 return next();
             }
-        } catch (error) {
-            return res.status(401).send({msg: "Unauthorized"});
+        } else {
+            return res.status(403).send({msg: "No token provided"});
         }
-    } else {
-        return res.status(403).send({msg: "No token provided"});
+    } catch (error) {
+        return res.status(401).send({msg: "Unauthorized"});
     }
 };
 
