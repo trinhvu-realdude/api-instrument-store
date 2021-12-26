@@ -9,9 +9,6 @@ module.exports = {
                 type: Sequelize.UUID,
                 defaultValue: uuidv4()
             },
-            instrument_id: {
-                type: Sequelize.INTEGER
-            },
             item_name: {
                 type: Sequelize.STRING
             },
@@ -27,11 +24,14 @@ module.exports = {
             image: {
                 type: Sequelize.STRING
             },
-            avaibility: {
+            availability: {
                 type: Sequelize.STRING
             },
             link_demo: {
                 type: Sequelize.STRING
+            },
+            instrument_id: {
+                type: Sequelize.INTEGER
             },
             createdAt: {
                 allowNull: false,

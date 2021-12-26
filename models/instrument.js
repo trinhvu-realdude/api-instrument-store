@@ -25,10 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     Instrument.init({
-        category_id: DataTypes.INTEGER,
-        manufacturer_id: DataTypes.INTEGER,
         instrument_name: DataTypes.STRING,
-        image: DataTypes.STRING
+        image: DataTypes.STRING,
+        category_id: DataTypes.INTEGER,
+        manufacturer_id: DataTypes.INTEGER
     }, {sequelize, modelName: 'Instrument'});
     return Instrument;
 };

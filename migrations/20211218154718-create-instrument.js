@@ -8,17 +8,17 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            category_id: {
-                type: Sequelize.INTEGER
-            },
-            manufacturer_id: {
-                type: Sequelize.INTEGER
-            },
             instrument_name: {
                 type: Sequelize.STRING
             },
             image: {
                 type: Sequelize.STRING
+            },
+            category_id: {
+                type: Sequelize.INTEGER
+            },
+            manufacturer_id: {
+                type: Sequelize.INTEGER
             },
             createdAt: {
                 allowNull: false,

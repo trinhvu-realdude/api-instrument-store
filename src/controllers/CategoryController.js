@@ -1,5 +1,5 @@
 const CategoryService = require("../services/CategoryService");
-const baseUrl = "http:localhost:5000/product/category/";
+const baseUrl = process.env.BASE_URL_CATEGORY;
 
 exports.addCategory = async (req, res) => {
     try {
@@ -21,7 +21,15 @@ exports.addCategory = async (req, res) => {
 };
 
 exports.getAllCategory = async (req, res) => {
-    const result = await CategoryService.getCategory();
+    const result = await CategoryService.getAllCategory();
 
-    return res.send(result);
+    return res.status(200).json(result);
+};
+
+exports.getAllCategoryByName = async (req, res) => {
+    const category_name = req.params.category_name;
+
+    const result = await CategoryService.getAllCategoryByName(category_name);
+
+    return res.status(200).json(result);
 }

@@ -1,17 +1,17 @@
 const InstrumentService = require("../services/InstrumentService");
-const baseUrl = "http:localhost:5000/product/instrument/";
+const baseUrl = process.env.BASE_URL_INSTRUMENT;
 
 exports.addInstrument = async (req, res) => {
     try {
-        const {category_id, manufacturer_id, instrument_name} = req.body;
+        const {instrument_name, category_id, manufacturer_id} = req.body;
 
         const image = req.file.originalname;
 
         const instrument = {
-            category_id: category_id,
-            manufacturer_id: manufacturer_id,
             instrument_name: instrument_name,
-            image: baseUrl + image
+            image: baseUrl + image,
+            category_id: category_id,
+            manufacturer_id: manufacturer_id
         };
 
         const result = await InstrumentService.addInstrument(instrument);
@@ -20,4 +20,10 @@ exports.addInstrument = async (req, res) => {
     } catch (error) {
         return res.status(500).json(error);
     }
+};
+
+exports.getAllInstrument = async (req, res) => {
+    const result = await InstrumentService.getAllInstrument();
+
+    return res.status(200).json(result);
 }

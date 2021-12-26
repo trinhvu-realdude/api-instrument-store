@@ -20,6 +20,8 @@ const upload = multer({storage: storage});
 
 module.exports = app => {
 
+    router.get("/", InstrumentController.getAllInstrument);
+
     router.post("/upload", AuthMiddleWare.isAdmin(["Admin", "Customer"]), upload.single("image"), InstrumentController.addInstrument);
 
     return app.use("/api/v1/instrument", router);

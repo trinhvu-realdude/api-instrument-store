@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         price: DataTypes.DECIMAL,
         discount: DataTypes.DECIMAL,
         image: DataTypes.STRING,
-        avaibility: DataTypes.STRING,
+        availability: DataTypes.STRING,
         link_demo: DataTypes.STRING,
         instrument_id: DataTypes.INTEGER
     }, {sequelize, modelName: 'Item'});

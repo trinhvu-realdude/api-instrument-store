@@ -1,5 +1,5 @@
 const AuthMiddleWare = require("../middleware/AuthMiddleware");
-const CategoryController = require("../controllers/CategoryController");
+const ItemController = require("../controllers/ItemController");
 const router = require("express").Router();
 
 // multer to upload public file
@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
         if (file.mimetype.split("/")[0] !== "image") {
             return cb(new Error("Invalid file type"));
         }
-        cb(null, "./public/product/category");
+        cb(null, "./public/product/item");
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname);
@@ -20,9 +20,9 @@ const upload = multer({storage: storage});
 
 module.exports = app => {
 
-    router.get("/", CategoryController.getAllCategory);
+    router.get("/", ItemController.getAllItem);
 
-    router.post("/upload", AuthMiddleWare.isAdmin(["Admin", "Customer"]), upload.single("image"), CategoryController.addCategory);
+    router.post("/upload", AuthMiddleWare.isAdmin(["Admin", "Customer"]), upload.single("image"), ItemController.addItem);
 
-    return app.use("/api/v1/category", router);
+    return app.use("/api/v1/item", router);
 }
