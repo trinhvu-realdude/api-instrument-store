@@ -22,6 +22,8 @@ module.exports = app => {
 
     router.get("/", InstrumentController.getAllInstrument);
 
+    router.get("/category", InstrumentController.getInstrumentByCategory);
+
     router.post("/upload", AuthMiddleWare.isAdmin(["Admin", "Customer"]), upload.single("image"), InstrumentController.addInstrument);
 
     return app.use("/api/v1/instrument", router);

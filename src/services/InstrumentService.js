@@ -21,3 +21,19 @@ exports.getAllInstrument = () => Instrument.findAll({
         }
     ]
 });
+
+exports.getInstrumentByCategory = (category_name) => Instrument.findAll({
+    attributes: [
+        "id", "instrument_name", "image"
+    ],
+    include: [
+        {
+            model: Category,
+            as: "category",
+            attributes: ["category_name"],
+            where: {
+                category_name: category_name
+            }
+        }
+    ]
+});

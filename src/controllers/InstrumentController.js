@@ -23,7 +23,23 @@ exports.addInstrument = async (req, res) => {
 };
 
 exports.getAllInstrument = async (req, res) => {
-    const result = await InstrumentService.getAllInstrument();
+    try {
+        const result = await InstrumentService.getAllInstrument();
 
-    return res.status(200).json(result);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+};
+
+exports.getInstrumentByCategory = async (req, res) => {
+    try {
+        const category_name = req.query.name.replace("%", " ");
+
+        const result = await InstrumentService.getInstrumentByCategory(category_name);
+
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
 }

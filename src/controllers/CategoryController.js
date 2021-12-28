@@ -21,15 +21,11 @@ exports.addCategory = async (req, res) => {
 };
 
 exports.getAllCategory = async (req, res) => {
-    const result = await CategoryService.getAllCategory();
+    try {
+        const result = await CategoryService.getAllCategory();
 
-    return res.status(200).json(result);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
 };
-
-exports.getAllCategoryByName = async (req, res) => {
-    const category_name = req.params.category_name;
-
-    const result = await CategoryService.getAllCategoryByName(category_name);
-
-    return res.status(200).json(result);
-}

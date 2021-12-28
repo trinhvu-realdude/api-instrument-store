@@ -10,7 +10,7 @@ module.exports = app => {
 
     router.post("/refresh-token", AuthController.refreshToken);
 
-    router.get("/test", AuthMiddleWare.isCustomer(["Admin", "Customer"]), AuthController.testCustomer);
+    router.post("/forgot-password", AuthController.forgotPassword);
 
     return app.use("/api/v1", router);
 }
