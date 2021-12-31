@@ -48,7 +48,7 @@ exports.getItemByInstrument = async (req, res) => {
     try {
         const instrument_name = req.query.name.replace("%", " ");
 
-        const result = await ItemService.getItemByInstrument(instrument_name.replace("%", " "));
+        const result = await ItemService.getItemByInstrument(instrument_name);
 
         return res.status(200).json(result);
     } catch (error) {

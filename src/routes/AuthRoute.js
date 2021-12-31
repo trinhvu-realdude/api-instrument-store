@@ -12,5 +12,7 @@ module.exports = app => {
 
     router.post("/forgot-password", AuthController.forgotPassword);
 
+    router.patch("/reset-password/:id", AuthController.resetPassword);
+
     return app.use("/api/v1", router);
 }

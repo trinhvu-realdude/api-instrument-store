@@ -1,7 +1,8 @@
 const jwtHelper = require("../helpers/JwtHelper");
-const authService = require("../services/AuthService");
+const AuthService = require("../services/AuthService");
 const {hashPassword} = require("../common/hash");
 const passport = require("passport");
+const nodemailer = require("nodemailer");
 
 const accessTokenLife = process.env.ACCESS_TOKEN_LIFE;
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
@@ -11,8 +12,8 @@ const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
 exports.register = async (req, res) => {
     try {
-        const checkEmail = await authService.checkEmail(req.body.email);
-        const checkUsername = await authService.checkUsername(req.body.user_name);
+        const checkEmail = await AuthService.checkEmail(req.body.email);
+        const checkUsername = await AuthService.checkUsername(req.body.user_name);
         if (checkEmail) {
             return res.status(403).send({msg: "Email already existed"});
         } else if (checkUsername) {
@@ -38,7 +39,7 @@ exports.register = async (req, res) => {
                 password: hash
             };
 
-            const user = await authService.registerUser(data);
+            const user = await AuthService.registerUser(data);
 
             return res.status(200).json(user);
         }
@@ -68,7 +69,7 @@ exports.login = async (req, res, next) => {
             let refresh_token = await jwtHelper.generateToken(dataForToken, refreshTokenSecret, refreshTokenLife);
 
             if (user.refresh_token === null) {
-                await authService.updateRefreshToken(refresh_token, user.id);
+                await AuthService.updateRefreshToken(refresh_token, user.id);
             } else {
                 refresh_token = user.refresh_token;
             }
@@ -120,5 +121,53 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.forgotPassword = async (req, res) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.ADMIN_EMAIL,
+                pass: process.env.ADMIN_PASSWORD
+            }
+        });
     
-}
+        const checkEmail = await AuthService.checkEmail(req.body.email);
+    
+        if (checkEmail) {
+            const mailOptions = {
+                from: `Admin Store <${process.env.ADMIN_EMAIL}>`,
+                to: req.body.email,
+                subject: "🔒 Password Reset E-Mail",
+                html: `
+                    <p>You're receiving this e-mail because you or someone else has requested a password reset for your user account at.</p>
+                    <p>Click the link to reset your password: <a href="${process.env.BASE_URL + checkEmail.id}">Click here</a></p>
+                    <p>If you did not request a password reset you can safely ignore this email.</p>
+                `
+            };
+        
+            transporter.sendMail(mailOptions, async (error, info) => {
+                if (error) {
+                    return res.status(403).send({msg: "Something wrong"});
+                } else {
+                    console.log("Email sent: " + info.response);
+                    return res.status(200).send({msg: "Already sent verification code to email"});
+                }
+            });   
+        } else {
+            return res.status(404).send({msg: "Email doesn't exist"});
+        }    
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const checkUser = await AuthService.checkUserById(req.params.id);
+
+        console.log(checkUser.dataValues);
+
+        return res.status(200).json({msg: "Test"});
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+};
