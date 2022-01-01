@@ -129,9 +129,9 @@ exports.forgotPassword = async (req, res) => {
                 pass: process.env.ADMIN_PASSWORD
             }
         });
-    
+
         const checkEmail = await AuthService.checkEmail(req.body.email);
-    
+
         if (checkEmail) {
             const mailOptions = {
                 from: `Admin Store <${process.env.ADMIN_EMAIL}>`,
@@ -143,7 +143,7 @@ exports.forgotPassword = async (req, res) => {
                     <p>If you did not request a password reset you can safely ignore this email.</p>
                 `
             };
-        
+
             transporter.sendMail(mailOptions, async (error, info) => {
                 if (error) {
                     return res.status(403).send({msg: "Something wrong"});
@@ -151,10 +151,10 @@ exports.forgotPassword = async (req, res) => {
                     console.log("Email sent: " + info.response);
                     return res.status(200).send({msg: "Already sent verification code to email"});
                 }
-            });   
+            });
         } else {
             return res.status(404).send({msg: "Email doesn't exist"});
-        }    
+        }
     } catch (error) {
         return res.status(500).json(error);
     }
@@ -162,11 +162,23 @@ exports.forgotPassword = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
     try {
-        const checkUser = await AuthService.checkUserById(req.params.id);
+        const {new_password, confirm_password} = req.body;
 
-        console.log(checkUser.dataValues);
+        if (new_password !== confirm_password) {
+            return res.status(400).send({msg: "Passwords do not match"});
+        } else {
+            const checkUser = await AuthService.checkUserById(req.params.id);
 
-        return res.status(200).json({msg: "Test"});
+            const hash = await hashPassword(new_password);
+
+            const reset = await AuthService.resetPassword(hash, checkUser.id);
+
+            if (reset != 1) {
+                return res.status(400).send({msg: `Cannot reset password with id = ${checkUser.id}`});
+            }
+
+            return res.status(200).send({msg: "Reset password successfully"});
+        }
     } catch (error) {
         return res.status(500).json(error);
     }
