@@ -54,4 +54,20 @@ exports.getItemByInstrument = async (req, res) => {
     } catch (error) {
         return res.status(500).json(error);
     }
-}
+};
+
+exports.deleteItemById = async (req, res) => {
+    try {
+        const item_id = req.params.id;
+
+        const result = await ItemService.deleteItemById(item_id);
+
+        if (result != 1) {
+            return res.status(400).send({msg: "Something wrong"});
+        }
+
+        return res.status(200).send({msg: "Delete the item successfully"});
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+};

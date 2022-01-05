@@ -13,6 +13,7 @@ exports.getAllItem = () => Item.findAll({
         "description",
         "price",
         "discount",
+        "image",
         "availability",
         "link_demo",
     ],
@@ -43,6 +44,7 @@ exports.getItemByInstrument = (instrument_name) => Item.findAll({
         "description",
         "price",
         "discount",
+        "image",
         "availability",
         "link_demo",
     ],
@@ -67,4 +69,10 @@ exports.getItemByInstrument = (instrument_name) => Item.findAll({
             ]
         }
     ]
-})
+});
+
+exports.deleteItemById = (item_id) => Item.destroy({
+    where: {
+        id: item_id
+    }
+});

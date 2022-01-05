@@ -26,5 +26,7 @@ module.exports = app => {
 
     router.post("/upload", AuthMiddleWare.isAdmin(["Admin", "Customer"]), upload.single("image"), ItemController.addItem);
 
+    router.delete("/:id", AuthMiddleWare.isAdmin(["Admin", "Customer"]), ItemController.deleteItemById);
+
     return app.use("/api/v1/item", router);
 }
