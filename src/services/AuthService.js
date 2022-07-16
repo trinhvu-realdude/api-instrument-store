@@ -34,12 +34,4 @@ exports.registerUser = (user) => User.create({
     role_id: 2
 });
 
-exports.updateRefreshToken = (token, id) => User.update({
-    refresh_token: token
-}, {
-    where: {
-        id: id
-    }
-});
-
 exports.getRole = (id) => Role.findByPk(id, {attributes: ["name"]});

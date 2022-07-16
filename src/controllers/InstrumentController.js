@@ -26,7 +26,7 @@ exports.getAllInstrument = async (req, res) => {
     try {
         const result = await InstrumentService.getAllInstrument();
 
-        return res.status(200).json(result);
+        return res.status(200).json(result.length == 0 ? {msg: "List is empty"} : result);
     } catch (error) {
         return res.status(500).json(error);
     }

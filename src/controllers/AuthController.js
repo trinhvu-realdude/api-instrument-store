@@ -23,7 +23,6 @@ exports.register = async (req, res) => {
                 user_name,
                 first_name,
                 last_name,
-                province,
                 email,
                 password
             } = req.body;
@@ -34,14 +33,13 @@ exports.register = async (req, res) => {
                 user_name: user_name,
                 first_name: first_name,
                 last_name: last_name,
-                province: province,
                 email: email,
                 password: hash
             };
 
-            const user = await AuthService.registerUser(data);
+            await AuthService.registerUser(data);
 
-            return res.status(200).json(user);
+            return res.status(200).json({msg: "User registered successfully"});
         }
     } catch (error) {
         return res.status(500).json(error);
@@ -67,12 +65,6 @@ exports.login = async (req, res, next) => {
             const access_token = await jwtHelper.generateToken(dataForToken, accessTokenSecret, accessTokenLife);
 
             let refresh_token = await jwtHelper.generateToken(dataForToken, refreshTokenSecret, refreshTokenLife);
-
-            if (user.refresh_token === null) {
-                await AuthService.updateRefreshToken(refresh_token, user.id);
-            } else {
-                refresh_token = user.refresh_token;
-            }
 
             return res.status(200).json({
                 msg: "Login successfully",
@@ -134,18 +126,23 @@ exports.forgotPassword = async (req, res) => {
 
         if (checkEmail) {
             const mailOptions = {
-                from: `Admin Store <${process.env.ADMIN_EMAIL}>`,
+                from: `Admin Store <${
+                    process.env.ADMIN_EMAIL
+                }>`,
                 to: req.body.email,
                 subject: "🔒 Password Reset E-Mail",
                 html: `
                     <p>You're receiving this e-mail because you or someone else has requested a password reset for your user account at.</p>
-                    <p>Click the link to reset your password: <a href="${process.env.BASE_URL + checkEmail.id}">Click here</a></p>
+                    <p>Click the link to reset your password: <a href="${
+                    process.env.BASE_URL + checkEmail.id
+                }">Click here</a></p>
                     <p>If you did not request a password reset you can safely ignore this email.</p>
                 `
             };
 
             transporter.sendMail(mailOptions, async (error, info) => {
                 if (error) {
+                    console.log(error);
                     return res.status(403).send({msg: "Something wrong"});
                 } else {
                     console.log("Email sent: " + info.response);
@@ -174,7 +171,11 @@ exports.resetPassword = async (req, res) => {
             const reset = await AuthService.resetPassword(hash, checkUser.id);
 
             if (reset != 1) {
-                return res.status(400).send({msg: `Cannot reset password with id = ${checkUser.id}`});
+                return res.status(400).send({
+                        msg: `Cannot reset password with id = ${
+                        checkUser.id
+                    }`
+                });
             }
 
             return res.status(200).send({msg: "Reset password successfully"});
