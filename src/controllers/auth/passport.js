@@ -33,7 +33,6 @@ module.exports = (passport) => {
                 return done(null, user);
 
             } catch (e) {
-                console.log(e);
                 return done(null, false);
             }
         })
