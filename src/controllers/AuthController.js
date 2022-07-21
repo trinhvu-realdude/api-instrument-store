@@ -10,6 +10,8 @@ const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE;
 const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
+const debug = console.log.bind(console);
+
 exports.register = async (req, res) => {
     try {
         const checkEmail = await AuthService.checkEmail(req.body.email);
@@ -47,6 +49,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res, next) => {
+    debug("Enter login()");
     passport.authenticate("local-login", async (err, user) => {
         try {
             if (err) {
@@ -83,12 +86,14 @@ exports.login = async (req, res, next) => {
                 }
             });
         } catch (error) {
+            debug("Error during login: " + error);
             return res.status(500).json(error);
         }
     })(req, res, next);
 };
 
 exports.refreshToken = async (req, res) => {
+    debug("Enter refreshToken()");
     const refreshTokenFromClient = req.body.refresh_token;
 
     if (refreshTokenFromClient) {
